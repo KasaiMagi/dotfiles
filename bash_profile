@@ -13,10 +13,17 @@ alias dotsync=${SCRIPT_PATH}/bin/sync-dotfiles.sh
 
 ###################### Bash settings
 export EDITOR=nano
-export PS1='\[\033[0;32m\]\u@\h\[\033[0;36m\]:\w\[\033[00m\]: '
+
+if [ -f ${SCRIPT_PATH}/isProduction ]; then
+    export PS1='\[\033[0;31m\]\u@\h\[\033[0;36m\]:\w\[\033[00m\]: ' #red
+else
+    export PS1='\[\033[0;32m\]\u@\h\[\033[0;36m\]:\w\[\033[00m\]: ' #green
+fi
+
 export HISTCONTROL=ignoreboth
-export HISTFILESIZE=5000
-export HISTSIZE=5000
+export HISTFILESIZE=50000
+export HISTSIZE=50000
+export PROMPT_COMMAND="history -n;$PROMPT_COMMAND" # Write/read from bash history after each command
 
 export ACK_OPTIONS="-i --sort-files --color --follow --group"
 
@@ -41,7 +48,10 @@ bind '"\e[A"':history-search-backward
 bind '"\e[B"':history-search-forward
 bind '"\M-w"':"\"\C-k\C-ahistory | grep '^ *[0-9]* *\C-e.'\C-m\""
 bind Space:magic-space # `svn diff !:2` inserts 2nd arg from previous 
-#bind '"\C-\t":menu-complete'
+
+# Enable Ctrl+s to forward search through history http://stackoverflow.com/q/791765/6305
+[[ $- == *i* ]] && stty -ixon
+
 
 ###################### Mac Settings
 if [[ $OSTYPE == darwin1* ]]; then
@@ -71,10 +81,10 @@ if [ -f ~/.localrc ]; then
     source ~/.localrc
 fi
 
-#source ${SCRIPT_PATH}/z.sh
 source ${SCRIPT_PATH}/fasd/fasd
 eval "$(fasd --init auto)"
 alias v="fasd -e vim"
+alias vv="fasd -i -e vim"
 
 ######################  PATH + Private bin
 if [ -d ${SCRIPT_PATH}/bin ] ; then
